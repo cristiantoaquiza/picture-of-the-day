@@ -13,7 +13,7 @@ describe("App", () => {
   };
 
   const response = {
-    json: () => data,
+    json: () => Promise.resolve(data),
   };
 
   beforeEach(() => {
@@ -21,9 +21,9 @@ describe("App", () => {
     fetch.mockResolvedValue(response);
   });
 
-  it("should get picture of the day data from NASA api", () => {
-    act(() => {
-      create(<App />);
+  it("should get picture of the day data from NASA api", async () => {
+    await act(async () => {
+      await create(<App />);
     });
 
     expect(fetch).toBeCalledTimes(1);
@@ -32,7 +32,7 @@ describe("App", () => {
   it("should render the title on a header tag", async () => {
     let appComponent;
     await act(async () => {
-      appComponent = create(<App />);
+      appComponent = await create(<App />);
     });
     const root = appComponent.root;
 
@@ -44,7 +44,7 @@ describe("App", () => {
   it("should render the url on a image tag", async () => {
     let appComponent;
     await act(async () => {
-      appComponent = create(<App />);
+      appComponent = await create(<App />);
     });
     const root = appComponent.root;
 
@@ -56,7 +56,7 @@ describe("App", () => {
   it("should render the explanation on a paragraph tag", async () => {
     let appComponent;
     await act(async () => {
-      appComponent = create(<App />);
+      appComponent = await create(<App />);
     });
     const root = appComponent.root;
 
@@ -68,7 +68,7 @@ describe("App", () => {
   it("should render the date on a span tag", async () => {
     let appComponent;
     await act(async () => {
-      appComponent = create(<App />);
+      appComponent = await create(<App />);
     });
     const root = appComponent.root;
 

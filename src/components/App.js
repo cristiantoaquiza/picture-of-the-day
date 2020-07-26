@@ -10,7 +10,7 @@ const App = () => {
     const response = await fetch(
       "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY"
     );
-    const data = response.json();
+    const data = await response.json();
     const { title, explanation, url, date } = data;
     setTitle(title);
     setExplanation(explanation);
