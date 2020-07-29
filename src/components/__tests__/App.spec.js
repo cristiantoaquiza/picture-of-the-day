@@ -22,11 +22,18 @@ describe("App", () => {
   });
 
   it("should get picture of the day data from NASA api", async () => {
+    global.Date.prototype.getDate = jest.fn().mockReturnValue(22);
+    global.Date.prototype.getFullYear = jest.fn().mockReturnValue(2019);
+    global.Date.prototype.getMonth = jest.fn().mockReturnValue(5);
+
     await act(async () => {
       await create(<App />);
     });
 
     expect(fetch).toBeCalledTimes(1);
+    expect(fetch).toBeCalledWith(
+      "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date=2019-6-22"
+    );
   });
 
   it("should render the title on a header tag", async () => {
