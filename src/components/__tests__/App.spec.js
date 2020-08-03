@@ -6,15 +6,13 @@ global.fetch = jest.fn();
 
 describe("App", () => {
   const data = {
-    date: "2020-07-25",
+    date: "2019-06-22",
     explanation: "some large explanation here",
     title: "some title here",
     url: "http://the-url-here",
   };
 
-  const response = {
-    json: () => Promise.resolve(data),
-  };
+  const response = { json: () => Promise.resolve(data) };
 
   beforeEach(() => {
     fetch.mockClear();
@@ -48,7 +46,10 @@ describe("App", () => {
     expect(header.props.children).toBe(data.title);
   });
 
-  it("should render the url on a image tag", async () => {
+  it("should render the url on an image tag when media type is image", async () => {
+    const dataWithImage = { ...data, media_type: "image" };
+    const response = { json: () => Promise.resolve(dataWithImage) };
+    fetch.mockResolvedValue(response);
     let appComponent;
     await act(async () => {
       appComponent = await create(<App />);
@@ -56,8 +57,27 @@ describe("App", () => {
     const root = appComponent.root;
 
     const image = root.findByType("img");
+    const iframeElements = root.findAllByType("iframe");
 
     expect(image.props.src).toBe(data.url);
+    expect(iframeElements.length).toBe(0);
+  });
+
+  it("should render the url on an iframe tag when media type is video", async () => {
+    const dataWithVideo = { ...data, media_type: "video" };
+    const response = { json: () => Promise.resolve(dataWithVideo) };
+    fetch.mockResolvedValue(response);
+    let appComponent;
+    await act(async () => {
+      appComponent = await create(<App />);
+    });
+    const root = appComponent.root;
+
+    const iframe = root.findByType("iframe");
+    const imgElements = root.findAllByType("img");
+
+    expect(iframe.props.src).toBe(data.url);
+    expect(imgElements.length).toBe(0);
   });
 
   it("should render the explanation on a paragraph tag", async () => {
