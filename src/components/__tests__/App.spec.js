@@ -1,10 +1,11 @@
 import React from "react";
 import { create, act } from "react-test-renderer";
+import { render, waitFor } from '@testing-library/react'
 import App from "../App";
 
 global.fetch = jest.fn();
 
-describe("App", () => {
+describe("AppTestRenderer", () => {
   const data = {
     date: "2019-06-22",
     explanation: "some large explanation here",
@@ -104,3 +105,38 @@ describe("App", () => {
     expect(span.props.children).toBe(data.date);
   });
 });
+
+describe('AppTestingLibrary', () => {
+  const data = {
+    date: "2019-06-22",
+    explanation: "some large explanation here",
+    title: "some title here",
+    url: "http://the-url-here",
+  };
+
+  const response = { json: () => Promise.resolve(data) };
+
+  beforeEach(() => {
+    fetch.mockClear();
+    fetch.mockResolvedValue(response);
+  });
+
+  it('should show picture of the day data got from NASA API', async () => {
+    global.Date.prototype.getDate = jest.fn().mockReturnValue(22);
+    global.Date.prototype.getFullYear = jest.fn().mockReturnValue(2019);
+    global.Date.prototype.getMonth = jest.fn().mockReturnValue(5);
+
+    const { getByText } = render(<App />)
+    const title = await waitFor(() => getByText(data.title))
+    const explanation = await waitFor(() => getByText(data.explanation))
+    const date = await waitFor(() => getByText(data.date))
+
+    expect(fetch).toBeCalledTimes(1);
+    expect(fetch).toBeCalledWith(
+      "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date=2019-6-22"
+    );
+    expect(title).toBeDefined()
+    expect(explanation).toBeDefined()
+    expect(date).toBeDefined()
+  })
+})
